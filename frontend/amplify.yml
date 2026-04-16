@@ -1,0 +1,6 @@
+{
+  "framework": "NONE",
+  "buildCommand": "echo 'Static site - no build needed'",
+  "startCommand": "echo 'Served by Amplify hosting'",
+  "outputDirectory": "public"
+}
