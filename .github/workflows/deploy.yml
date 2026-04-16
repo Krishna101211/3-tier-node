@@ -92,7 +92,7 @@ jobs:
   deploy-frontend:
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.AMPLIFY_APP_ID != ''
     steps:
       - uses: actions/checkout@v4
 
@@ -135,11 +135,16 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            which aws || (sudo apt-get update && sudo apt-get install -y awscli)
+            
+            [ -d /home/ubuntu/app ] || git clone https://github.com/Krishna101211/3-tier-node.git /home/ubuntu/app
+            
             aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
 
             cd /home/ubuntu/app
 
-            docker compose pull app
+            [ -f .env ] || cp .env.example .env
+            docker compose pull app || true
             docker compose up -d app
 
             echo "Waiting for app to be healthy..."
