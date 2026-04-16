@@ -6,7 +6,7 @@
   "scripts": {
     "start": "pm2-runtime start ecosystem.config.js --env production",
     "dev": "nodemon src/server.js",
-    "test": "jest --coverage --setupFiles dotenv/config --detectOpenHandles --forceExit"
+    "test": "jest --coverage --forceExit"
   },
   "dependencies": {
     "express": "^4.18.2",
