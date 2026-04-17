@@ -103,11 +103,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Inject API URL into frontend
-        run: |
-          API_URL="http://${{ secrets.EC2_HOST }}/api/users"
-          sed -i "s#http://localhost:3001/api/users#${API_URL}#g" frontend/public/index.html
-
       - name: Deploy to Amplify
         run: |
           echo "Cancelling any existing pending/running Amplify jobs..."
@@ -130,6 +125,12 @@ jobs:
             --app-id ${{ secrets.AMPLIFY_APP_ID }} \
             --branch-name main \
             --job-type RELEASE
+
+      - name: Set Amplify environment variable
+        run: |
+          aws amplify update-app \
+            --app-id ${{ secrets.AMPLIFY_APP_ID }} \
+            --environment-variables API_HOST=${{ secrets.EC2_HOST }} || true
 
   deploy-backend:
     needs: build-and-push

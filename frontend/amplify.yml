@@ -1,6 +1,6 @@
 {
   "framework": "NONE",
-  "buildCommand": "echo 'Static site - no build needed'",
+  "buildCommand": "if [ -n \"$API_HOST\" ]; then sed -i \"s#http://localhost:3001/api/users#http://$API_HOST/api/users#g\" public/index.html; fi && echo 'Build complete'",
   "startCommand": "echo 'Served by Amplify hosting'",
   "outputDirectory": "public"
 }
