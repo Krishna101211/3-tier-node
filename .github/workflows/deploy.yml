@@ -92,7 +92,7 @@ jobs:
   deploy-frontend:
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.AMPLIFY_APP_ID != ''
     steps:
       - uses: actions/checkout@v4
 
@@ -110,6 +110,22 @@ jobs:
 
       - name: Deploy to Amplify
         run: |
+          echo "Cancelling any existing pending/running Amplify jobs..."
+          for JOB_ID in $(aws amplify list-jobs \
+            --app-id ${{ secrets.AMPLIFY_APP_ID }} \
+            --branch-name main \
+            --query "jobSummaries[?status=='PENDING'||status=='RUNNING'].jobId" \
+            --output text 2>/dev/null); do
+            echo "Cancelling job $JOB_ID..."
+            aws amplify stop-job \
+              --app-id ${{ secrets.AMPLIFY_APP_ID }} \
+              --branch-name main \
+              --job-id "$JOB_ID" || true
+          done
+
+          echo "Waiting for jobs to fully cancel..."
+          sleep 10
+
           aws amplify start-job \
             --app-id ${{ secrets.AMPLIFY_APP_ID }} \
             --branch-name main \
