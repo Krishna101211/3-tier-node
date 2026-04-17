@@ -106,7 +106,7 @@ jobs:
       - name: Inject API URL into frontend
         run: |
           API_URL="http://${{ secrets.EC2_HOST }}/api/users"
-          sed -i "s#http://localhost:3000/api/users#${API_URL}#g" frontend/public/index.html
+          sed -i "s#http://localhost:3001/api/users#${API_URL}#g" frontend/public/index.html
 
       - name: Deploy to Amplify
         run: |
